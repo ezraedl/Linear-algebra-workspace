@@ -52,10 +52,10 @@ input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
 .errorCell{border-color:var(--red)!important;box-shadow:0 0 0 2px #ff8d9133!important}
 
 /* Read-only matrices */
-.displaymatrix{display:flex;align-items:stretch;width:max-content;max-width:100%;margin:0 auto;overflow-x:auto;padding:8px 0 4px}
+.displaymatrix{display:flex;align-items:stretch;width:max-content;max-width:100%;margin:0 auto;overflow-x:auto;padding:8px 0 4px;font-size:14px}
 .displaygrid{display:grid;gap:4px;padding:8px}
-.val{text-align:center;min-width:42px;padding:4px 7px;white-space:nowrap;font-family:ui-monospace,Consolas,monospace;font-size:14px}
-.val.rhs{border-left:2px solid var(--green);padding-left:13px}
+.val{text-align:center;min-width:3em;padding:.29em .5em;white-space:nowrap;font-family:ui-monospace,Consolas,monospace;font-size:1em}
+.val.rhs{border-left:2px solid var(--green);padding-left:.93em}
 .val.has-calc{cursor:help;border-radius:6px;background:rgba(129,177,255,.11);outline:1px dotted rgba(129,177,255,.45)}
 .val.has-calc:hover,.val.has-calc:focus{background:rgba(129,177,255,.24);outline:2px solid var(--accent)}
 #calcTooltip{position:fixed;z-index:99999;max-width:min(390px,calc(100vw - 24px));width:max-content;white-space:pre-line;overflow-wrap:anywhere;background:#eff5ff;color:#14213b;border:1px solid #97b7e8;border-radius:11px;padding:12px 14px;box-shadow:0 12px 36px #0008;font:13px/1.65 ui-monospace,Consolas,monospace;pointer-events:none;display:none;direction:ltr;text-align:left}
@@ -76,7 +76,8 @@ input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
 .message.good{color:var(--green)}
 .command{display:flex;gap:7px;align-items:center}
 .opInput{flex:1;width:auto;min-width:0;height:44px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:15px}
-#apply{height:44px}
+#apply{height:44px;display:inline-flex;align-items:center;gap:6px}
+#apply .ico{width:16px;height:16px;flex:none}
 .roundbtn{flex:none;width:44px;height:44px;border:1px solid var(--stroke);border-radius:11px;background:#263451;color:var(--text);font-size:18px;line-height:1;font-weight:800;cursor:pointer;display:grid;place-items:center;padding:0;font-family:inherit}
 .roundbtn:hover,.roundbtn[aria-expanded=true]{background:#34466b;border-color:var(--accent)}
 
@@ -114,10 +115,12 @@ input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
 .cell{font-size:16px;padding:8px 2px}
 .rhs-divider{padding-left:8px}
 .opInput{font-size:16px}
-.val{min-width:34px;padding:3px 5px;font-size:13.5px}
-.val.rhs{padding-left:9px}
+.displaymatrix{font-size:13.5px}
+.val{min-width:2.5em;padding:.22em .37em}
+.val.rhs{padding-left:.67em}
 #apply .lbl{display:none}
-#apply{padding:10px 13px}
+#apply{width:52px;padding:0;justify-content:center}
+#apply .ico{width:24px;height:24px}
 .overflow-menu{min-width:0;left:0;right:0;width:auto}
 .overflow-menu button{white-space:normal}
 }
@@ -160,7 +163,7 @@ input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
 <button id="exportCsv" type="button" role="menuitem">Export CSV</button>
 <button id="importCsv" type="button" role="menuitem">Import CSV…</button>
 </div>
-<div class="command"><button id="helpButton" class="roundbtn" type="button" aria-label="Examples and syntax help" aria-expanded="false" aria-controls="helpPopover">?</button><input id="command" class="opInput" placeholder="R1 = R1 + 2R2" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" aria-label="Row operation"><button id="apply" class="btn primary" type="button"><span class="lbl">Apply</span> ↵</button><button id="moreMenuButton" class="roundbtn" type="button" aria-label="עוד פעולות" aria-haspopup="menu" aria-expanded="false" aria-controls="moreMenu">⋯</button></div>
+<div class="command"><button id="helpButton" class="roundbtn" type="button" aria-label="Examples and syntax help" aria-expanded="false" aria-controls="helpPopover">?</button><input id="command" class="opInput" placeholder="R1 = R1 + 2R2" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" aria-label="Row operation"><button id="apply" class="btn primary" type="button" aria-label="Apply"><span class="lbl">Apply</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="moreMenuButton" class="roundbtn" type="button" aria-label="עוד פעולות" aria-haspopup="menu" aria-expanded="false" aria-controls="moreMenu">⋯</button></div>
 <input type="file" id="csvFile" accept=".csv,text/csv,text/plain" hidden>
 </div></div>
 </main><script>
@@ -324,6 +327,18 @@ function autoReduce(){
 }
 function coef(s){let a=s.trim();if(a==='+'||a==='')return num(1);if(a==='-')return num(-1);if(a.startsWith('*'))a=a.slice(1);return parse(a)}
 function applyCommand(cmd){if(!cmd.trim())throw Error('Type a row operation, e.g. R2 = R2 - 2R1');ensureStart();let t=cmd.trim().replace(/[−–]/g,'-').replace(/↔/g,'<->').replace(/←→/g,'<->');let swap=t.match(/^R(\d+)\s*(?:<->|<=>|⇄)\s*R(\d+)$/i);let result=state.map(row=>row.slice()),detail='',name='',calcs=Array.from({length:rowCount},()=>[]);const index=k=>{let n=Number(k);if(n<1||n>rowCount)throw Error(`Row R${n} does not exist`);return n-1};if(swap){let a=index(swap[1]),b=index(swap[2]);if(a===b)throw Error('Choose two different rows to swap');[result[a],result[b]]=[result[b],result[a]];name=`R${a+1} ↔ R${b+1}`;detail='Swap two rows'}else{let m=t.match(/^R(\d+)\s*=\s*(.+)$/i);if(!m)throw Error('Use R1 = R1 + 2R2, R1 <-> R2, R2 = 3R2, or R2 = R2 / 3');let target=index(m[1]),rhs=m[2].replace(/\s/g,'');if(!rhs)throw Error('Missing right-hand side');let slash=rhs.match(/^R(\d+)\/(.+)$/i);if(slash){if(index(slash[1])!==target)throw Error('The source row must match the destination');let k=coef(slash[2]);if(eqz(k))throw Error('Cannot divide by zero');result[target]=state[target].map((v,j)=>{let out=divide(v,k);if(fieldPrime)calcs[target][j]=computedExplanation('divide',v,k,null,out,target,j,slash[2]);return out});detail='Divide entire row by a factor';name=`R${target+1} = R${target+1} / (${slash[2]})`}else{let add=rhs.match(/^R(\d+)([+-])(.*?)R(\d+)$/i);if(add){let self=index(add[1]),other=index(add[4]);if(self!==target)throw Error('The first row on the right must match the destination');if(target===other)throw Error('For scaling a row, use R1 = 2R1');let f=coef(add[3]);if(add[2]==='-')f=neg(f);result[target]=state[target].map((v,j)=>{let out=plus(v,times(f,state[other][j]));if(fieldPrime)calcs[target][j]=computedExplanation('add',v,f,state[other][j],out,target,j);return out});detail=`Add a multiple of R${other+1} to R${target+1}`;name=`R${target+1} = R${target+1} ${add[2]} ${add[3]}R${other+1}`}else{let scaling=rhs.match(/^(.*?)\*?R(\d+)$/i);if(!scaling||index(scaling[2])!==target)throw Error('Unsupported operation. Try R2 = R2 - aR1 or R2 = (1/3)R2');let f=coef(scaling[1]);if(eqz(f))throw Error('Cannot multiply a row by zero (not reversible)');result[target]=state[target].map((v,j)=>{let out=times(v,f);if(fieldPrime)calcs[target][j]=computedExplanation('scale',v,f,null,out,target,j);return out});detail='Multiply entire row by a nonzero factor';name=`R${target+1} = (${scaling[1]||'1'})R${target+1}`}}}state=result;steps.push({name,detail,matrix:structuredClone(result),calcs});active=steps.length-1;renderHistory(true);notice('Applied: '+name)}
+// Wide matrices shrink their font until they fit the card, down to MIN_MATRIX_FONT px; beyond that they scroll horizontally.
+const MIN_MATRIX_FONT=10;
+function fitMatrix(wrap){
+  wrap.style.fontSize='';
+  if(wrap.scrollWidth<=wrap.clientWidth+1)return;
+  const base=parseFloat(getComputedStyle(wrap).fontSize);
+  let f=Math.max(MIN_MATRIX_FONT,Math.floor(base*wrap.clientWidth/wrap.scrollWidth*2)/2);
+  wrap.style.fontSize=f+'px';
+  while(wrap.scrollWidth>wrap.clientWidth+1&&f>MIN_MATRIX_FONT){f=Math.max(MIN_MATRIX_FONT,f-.5);wrap.style.fontSize=f+'px'}
+}
+function fitMatrices(){document.querySelectorAll('#timeline .displaymatrix').forEach(fitMatrix)}
+let fitTimer=0;window.addEventListener('resize',()=>{clearTimeout(fitTimer);fitTimer=setTimeout(fitMatrices,120)});
 function renderHistory(scrollLatest=false){
   const isLocked=locked(),start=$('startCard');
   start.classList.toggle('locked',isLocked);start.classList.toggle('current',!isLocked);
@@ -348,6 +363,7 @@ function renderHistory(scrollLatest=false){
   const ops=Math.max(0,steps.length-1);
   $('counter').textContent=`${ops} operation${ops===1?'':'s'} · ${Math.max(1,steps.length)} matri${steps.length>1?'ces':'x'}`;
   $('undo').disabled=!isLocked;$('reset').disabled=!isLocked;$('clear').disabled=isLocked;
+  fitMatrices();
   if(scrollLatest)requestAnimationFrame(()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:'smooth'}));
 }
 // Export the full recorded timeline, including step 0, operations and augmented matrix values.
